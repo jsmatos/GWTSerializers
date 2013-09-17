@@ -1,0 +1,20 @@
+<!--
+  ~ Copyright (c) 2011 PT Inovação, S.A. All rights reserved.
+  ~ Id: PTINGWTLibs.gwt.xml, 12/10/11 14:35:07 10054915
+  -->
+
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.4//EN"
+        "http://google-web-toolkit.googlecode.com/svn/releases/2.4/distro-source/core/src/gwt-module.dtd">
+<module>
+    <source path="client"/>
+    <source path="shared"/>
+
+    <inherits name='com.google.gwt.user.User'/>
+    <inherits name="com.google.gwt.core.Core"/>
+    <inherits name="com.google.gwt.json.JSON"/>
+
+    <generate-with class="com.jsmatos.gwt.serialization.json.SerializationGenerator">
+        <when-type-assignable class="com.jsmatos.gwt.client.serialization.json.Serializer"/>
+    </generate-with>
+
+</module>

@@ -1,0 +1,2 @@
+# Module com.jsmatos.gwt.GWTSerializers.JUnit
+# RPC service class, partial path of RPC policy file

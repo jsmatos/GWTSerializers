@@ -24,12 +24,7 @@ public class Serializer {
     }
 
     static protected String getTypeName(Object obj) {
-        // WARNING: GWT.getTypeName is deprecated
-        //String typeName = GWT.getTypeName( obj );
-        //typeName = typeName.substring(typeName.lastIndexOf('.')+1);
-        //return typeName.toLowerCase();
-        String typeName = obj.getClass().getName();
-        return typeName;
+        return obj.getClass().getName();
     }
 
     public String serialize(Object pojo, Class<?> clazz) {

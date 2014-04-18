@@ -7,7 +7,7 @@
 	<packaging>jar</packaging>
 	<name></name>
 	<properties>
-		<gwt.version>2.5.1</gwt.version>
+		<gwt.version>2.6.0</gwt.version>
 	</properties>
 	<dependencies>
 		<dependency>

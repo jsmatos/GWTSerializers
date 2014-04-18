@@ -2,12 +2,9 @@ package com.jsmatos.gwt.client.serialization.json;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.json.client.JSONException;
-import com.google.gwt.json.client.JSONNull;
-import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.json.client.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -65,12 +62,18 @@ public class Serializer {
         if(pojo==null){
             return JSONNull.getInstance();
         }else{
-            String name = getTypeName(pojo);
-            ObjectSerializer serializer = getObjectSerializer(name);
-            if (serializer == null) {
-                throw new SerializationException("Can't find object serializer for " + name);
+            if (pojo instanceof Collection){
+                return serializeCollectionToJson((Collection<Object>) pojo);
+            }else if (pojo instanceof Map){
+                return serializeMapToJson((Map<String, ?>) pojo);
+            }else {
+                String name = getTypeName(pojo);
+                ObjectSerializer serializer = getObjectSerializer(name);
+                if (serializer == null) {
+                    throw new SerializationException("Can't find object serializer for " + name);
+                }
+                return serializer.serializeToJson(pojo);
             }
-            return serializer.serializeToJson(pojo);
         }
     }
 
@@ -103,8 +106,75 @@ public class Serializer {
         return (T) deSerialize(jsonString,clazz.getName());
     }
 
+    public <T> void fillMapWith(Map<String,T> map, JSONValue value, Class<T> clazz){
+        JSONObject object = value.isObject();
+        if(object!=null){
+            for (String key:object.keySet()){
+                map.put(key, deSerialize(object.get(key),clazz));
+            }
+        }
 
-    private static String JSON_Beautify(String input){
+    }
+    public <T> Map<String,T> fromMap(JSONValue value, Class<T> clazz){
+        if(value==null){
+            return null;
+        }
+        Map<String,T> result = new HashMap<String, T>();
+        fillMapWith(result,value,clazz);
+        return result;
+    }
+
+    public <T> void fillCollectionWith(Collection<T> collection, JSONValue value, Class<T> clazz){
+        JSONArray array = value.isArray();
+        if(array!=null) {
+            int size = array.size();
+            for (int i = 0; i < size; i++) {
+                collection.add(deSerialize(array.get(i), clazz));
+            }
+        }
+    }
+    public <T> Collection<T> fromCollection(JSONValue value, Class<T> clazz){
+        if(value==null){
+            return null;
+        }
+        Collection<T> result = new ArrayList<T>();
+        fillCollectionWith(result,value,clazz);
+        return result;
+    }
+
+    public <T> JSONValue serializeMapToJson(Map<String,?> map){
+        if(map==null){
+            return JSONNull.getInstance();
+        }else {
+            JSONObject object = new JSONObject();
+            for (Map.Entry<String,?> entry:map.entrySet()){
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                if(key!=null){
+                    object.put(key,serializeToJson(value));
+                }
+            }
+
+            return object;
+        }
+    }
+    public <T> JSONValue serializeCollectionToJson(Collection<T> collection){
+        if(collection==null){
+            return JSONNull.getInstance();
+        }else {
+            JSONArray array = new JSONArray();
+            int i=0;
+            for (T t:collection){
+                JSONValue value = serializeToJson(t);
+                array.set(i,value);
+            }
+
+            return array;
+        }
+    }
+
+
+    public static String JSON_Beautify(String input){
         JavaScriptObject javaScriptObject = JsonUtils.safeEval(input);
         return JSON_Beautify(javaScriptObject);
     }

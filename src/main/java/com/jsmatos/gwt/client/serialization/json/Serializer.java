@@ -12,19 +12,28 @@ public class Serializer {
     private static final Logger logger = Logger.getLogger(Serializer.class.getName());
     private static final Map<String,ObjectSerializer> SERIALIZABLE_TYPES = new HashMap<String,ObjectSerializer>();
 
+    protected Serializer() {
+    }
+
+    static protected String getTypeName(Object obj) {
+        return obj.getClass().getName();
+    }
+
+    public static String JSON_Beautify(String input){
+        JavaScriptObject javaScriptObject = JsonUtils.safeEval(input);
+        return JSON_Beautify(javaScriptObject);
+    }
+
+    private static native String JSON_Beautify(JavaScriptObject input)/*-{
+        return JSON.stringify(input, null, 4);
+    }-*/;
+
     protected void addObjectSerializer(String name, ObjectSerializer obj) {
         SERIALIZABLE_TYPES.put(name, obj);
     }
 
     protected ObjectSerializer getObjectSerializer(String name) {
         return SERIALIZABLE_TYPES.get(name);
-    }
-
-    protected Serializer() {
-    }
-
-    static protected String getTypeName(Object obj) {
-        return obj.getClass().getName();
     }
 
     public String serialize(Object pojo, Class<?> clazz) {
@@ -41,6 +50,7 @@ public class Serializer {
         }
 
     }
+
     public String serialize(Object pojo) {
         String json = serialize(pojo,pojo.getClass());
 
@@ -110,6 +120,7 @@ public class Serializer {
         }
 
     }
+
     public <T> Map<String,T> fromMap(JSONValue value, Class<T> clazz){
         if(value==null){
             return null;
@@ -128,6 +139,7 @@ public class Serializer {
             }
         }
     }
+
     public <T> Collection<T> fromCollection(JSONValue value, Class<T> clazz){
         if(value==null){
             return null;
@@ -153,6 +165,7 @@ public class Serializer {
             return object;
         }
     }
+
     public <T> JSONValue serializeCollectionToJson(Collection<T> collection){
         if(collection==null){
             return JSONNull.getInstance();
@@ -167,14 +180,4 @@ public class Serializer {
             return array;
         }
     }
-
-
-    public static String JSON_Beautify(String input){
-        JavaScriptObject javaScriptObject = JsonUtils.safeEval(input);
-        return JSON_Beautify(javaScriptObject);
-    }
-
-    private static native String JSON_Beautify(JavaScriptObject input)/*-{
-        return JSON.stringify(input, null, 4);
-    }-*/;
 }

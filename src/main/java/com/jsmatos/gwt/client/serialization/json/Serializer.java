@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Serializer {
+public class Serializer extends SerializerHelper{
     private static final Logger logger = Logger.getLogger(Serializer.class.getName());
     private static final Map<String,ObjectSerializer> SERIALIZABLE_TYPES = new HashMap<String,ObjectSerializer>();
 
@@ -63,23 +63,55 @@ public class Serializer {
         return json;
     }
 
+    public JSONValue serializeToJson(Map<String, ?> pojo) {
+        return serializeMapToJson(pojo);
+    }
+
     public JSONValue serializeToJson(Object pojo) {
         if(pojo==null){
             return JSONNull.getInstance();
-        }else{
-            if (pojo instanceof Collection){
-                return serializeCollectionToJson((Collection<Object>) pojo);
-            }else if (pojo instanceof Map){
-                return serializeMapToJson((Map<String, ?>) pojo);
-            }else {
-                String name = getTypeName(pojo);
-                ObjectSerializer serializer = getObjectSerializer(name);
-                if (serializer == null) {
-                    throw new SerializationException("Can't find object serializer for " + name);
-                }
-                return serializer.serializeToJson(pojo);
-            }
         }
+
+        if(pojo instanceof String){
+            return new JSONString((String) pojo);
+        }
+
+        if(pojo instanceof Character){
+            return getChar((Character) pojo);
+        }
+
+        if(pojo instanceof Date){
+            return getDate((Date) pojo);
+        }
+
+        if(pojo instanceof Enum){
+            return getEnum((Enum) pojo);
+        }
+
+        if(pojo instanceof Boolean){
+            return getBoolean((Boolean)pojo);
+        }
+
+        if (pojo instanceof Number){
+            return getNumber(((Number)pojo).doubleValue());
+        }
+
+        if (pojo instanceof Map){
+            return serializeToJson((Map<String, ?>) pojo);
+        }
+
+        if (pojo instanceof Collection){
+            return serializeCollectionToJson((Collection) pojo);
+        }
+
+        String name = getTypeName(pojo);
+        ObjectSerializer serializer = getObjectSerializer(name);
+        if (serializer == null) {
+            throw new SerializationException("Can't find object serializer for " + name);
+        }
+        return serializer.serializeToJson(pojo);
+
+
     }
 
     public <T> T deSerialize(JSONValue jsonValue, Class<T> clazz) throws JSONException {
@@ -149,7 +181,7 @@ public class Serializer {
         return result;
     }
 
-    public <T> JSONValue serializeMapToJson(Map<String,?> map){
+    public JSONValue serializeMapToJson(Map<String,?> map){
         if(map==null){
             return JSONNull.getInstance();
         }else {

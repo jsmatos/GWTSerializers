@@ -5,7 +5,7 @@ import com.google.gwt.json.client.*;
 import java.util.Date;
 
 
-public class SerializerHelper {
+public class SerializerHelper extends DeserializerHelper{
 
     public static JSONValue getEnum(Enum e){
         if(e==null){

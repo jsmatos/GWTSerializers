@@ -172,7 +172,7 @@ public class Serializer extends SerializerHelper{
         }
     }
 
-    public <T> Collection<T> fromCollection(JSONValue value, Class<T> clazz){
+    public <T> Collection<T> fromCollection(JSONArray value, Class<T> clazz){
         if(value==null){
             return null;
         }

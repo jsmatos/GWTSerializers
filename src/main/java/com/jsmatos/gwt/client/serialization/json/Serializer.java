@@ -207,6 +207,7 @@ public class Serializer extends SerializerHelper{
             for (T t:collection){
                 JSONValue value = serializeToJson(t);
                 array.set(i,value);
+                i++;
             }
 
             return array;
